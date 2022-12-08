@@ -23,7 +23,7 @@ public class TestServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	// Define datasource/connection pool for Resource Injection
-	@Resource(name = "jdbc/web_student_tracker")
+	@Resource(name = "jdbc/web_candidates")
 	private DataSource dataSource;
 
 	/**
@@ -46,7 +46,7 @@ public class TestServlet extends HttpServlet {
 			myConn = dataSource.getConnection();
 
 			// Step 3: Create a SQL statements
-			String sql = "select * from student";
+			String sql = "select * from candidates";
 			myStmt = myConn.createStatement();
 
 			// Step 4: Execute SQL query
@@ -55,9 +55,12 @@ public class TestServlet extends HttpServlet {
 			// Step 5: Process the result set
 			while (myRs.next()) {
 				String last_name = myRs.getString("last_name");
-				String first_name = myRs.getString("first_name");
+				String name = myRs.getString("name");
 				String email = myRs.getString("email");
-				out.println(last_name + " " + first_name + " " + email);
+				String phone = myRs.getString("phone");
+				String department = myRs.getString("department");
+				String degree = myRs.getString("degree");
+				out.println(last_name + " " + name + " " + email);
 			}
 		} catch (Exception exc) {
 			exc.printStackTrace();

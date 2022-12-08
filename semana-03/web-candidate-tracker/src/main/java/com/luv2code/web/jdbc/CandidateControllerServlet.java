@@ -15,15 +15,15 @@ import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 /**
- * Servlet implementation class StudentControllerServlet
+ * Servlet implementation class CandidateControllerServlet
  */
-@WebServlet("/StudentControllerServlet")
-public class StudentControllerServlet extends HttpServlet {
+@WebServlet("/CandidateControllerServlet")
+public class CandidateControllerServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	private StudentDbUtil studentDbUtil;
+	private CandidateDbUtil candidateDbUtil;
 	
-	@Resource(name="jdbc/web_student_tracker") //SE COMENTO PARA HACER USO DE JNDI
+	@Resource(name="jdbc/web_candidates") //SE COMENTO PARA HACER USO DE JNDI
 	private DataSource dataSource;
 	
 	
@@ -36,7 +36,7 @@ public class StudentControllerServlet extends HttpServlet {
 			/*Context ctx = new InitialContext(); //USO DE JNDI
 			dataSource = (DataSource) ctx.lookup("java:/comp/env/jdbc/javatechie"); //USO DE JNDI
 			System.out.println("Demo con JNDI, Datasource: "+dataSource);*/
-			studentDbUtil = new StudentDbUtil(dataSource);
+			candidateDbUtil = new CandidateDbUtil(dataSource);
 		}
 		catch (Exception exc) {
 			throw new ServletException(exc);
@@ -59,7 +59,7 @@ public class StudentControllerServlet extends HttpServlet {
 			switch (theCommand) {
 			
 			case "LIST":
-				listStudents(request, response);
+				listCandidates(request, response);
 				break;
 				
 			case "ADD":
@@ -79,7 +79,7 @@ public class StudentControllerServlet extends HttpServlet {
 				break;
 				
 			default:
-				listStudents(request, response);
+				listCandidates(request, response);
 			}
 				
 		}
@@ -96,10 +96,10 @@ public class StudentControllerServlet extends HttpServlet {
 		String theStudentId = request.getParameter("studentId");
 		
 		// delete student from database
-		studentDbUtil.deleteStudent(theStudentId);
+		candidateDbUtil.deleteStudent(theStudentId);
 		
 		// send them back to "list students" page
-		listStudents(request, response);
+		listCandidates(request, response);
 	}
 
 	private void updateStudent(HttpServletRequest request, HttpServletResponse response)
@@ -107,18 +107,21 @@ public class StudentControllerServlet extends HttpServlet {
 
 		// read student info from form data
 		int id = Integer.parseInt(request.getParameter("studentId"));
-		String firstName = request.getParameter("firstName");
+		String firstName = request.getParameter("name");
 		String lastName = request.getParameter("lastName");
 		String email = request.getParameter("email");
+		String phone = request.getParameter("phone");
+		String department = request.getParameter("department");
+		String degree = request.getParameter("degree");
 		
 		// create a new student object
-		Student theStudent = new Student(id, firstName, lastName, email);
+		Candidate theCandidate = new Candidate(id, firstName, lastName, email, phone, department, degree);
 		
 		// perform update on database
-		studentDbUtil.updateStudent(theStudent);
+		candidateDbUtil.updateCandidate(theCandidate);
 		
 		// send them back to the "list students" page
-		listStudents(request, response);
+		listCandidates(request, response);
 		
 	}
 
@@ -126,13 +129,13 @@ public class StudentControllerServlet extends HttpServlet {
 		throws Exception {
 
 		// read student id from form data
-		String theStudentId = request.getParameter("studentId");
+		String theCandidateId = request.getParameter("studentId");
 		
 		// get student from database (db util)
-		Student theStudent = studentDbUtil.getStudent(theStudentId);
+		Candidate theCandidate = candidateDbUtil.getCandidate(theCandidateId);
 		
 		// place student in the request attribute
-		request.setAttribute("THE_STUDENT", theStudent);
+		request.setAttribute("THE_STUDENT", theCandidate);
 		
 		// send to jsp page: update-student-form.jsp
 		RequestDispatcher dispatcher = 
@@ -143,34 +146,37 @@ public class StudentControllerServlet extends HttpServlet {
 	private void addStudent(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 		// read student info from form data
-		String firstName = request.getParameter("firstName");
+		String firstName = request.getParameter("name");
 		String lastName = request.getParameter("lastName");
-		String email = request.getParameter("email");		
+		String email = request.getParameter("email");
+		String phone = request.getParameter("phone");
+		String department = request.getParameter("department");
+		String degree = request.getParameter("degree");
 		
 		// create a new student object
-		Student theStudent = new Student(firstName, lastName, email);
+		Candidate theCandidate = new Candidate(firstName, lastName, email, phone, department, degree);
 		
 		// add the student to the database
-		studentDbUtil.addStudent(theStudent);
+		candidateDbUtil.addCandidate(theCandidate);
 				
 		// send back to main page (the student list)
-		listStudents(request, response);
+		listCandidates(request, response);
 	}
 
-	private void listStudents(
+	private void listCandidates(
 			HttpServletRequest request, HttpServletResponse response) 
 		throws Exception {
 
 		// get students from db util
-		List<Student> students = studentDbUtil.getStudents();
+		List<Candidate> candidates = candidateDbUtil.getCandidates();
 		
-		for (Student s:students) {
-			System.out.println(s);
+		for (Candidate c:candidates) {
+			System.out.println(c);
 		}
 		
-		students.add(new Student(999, "FirstName","lastName", "email@gmail"));
+		candidates.add(new Candidate(999, "Name", "LastName", "Email", "Phone", "Department", "Degree"));
 		// add students to the request
-		request.setAttribute("LISTA_ESTUDIANTES", students);
+		request.setAttribute("LISTA_CANDIDATOS", candidates);
 		
 				
 		// send to JSP page (view)

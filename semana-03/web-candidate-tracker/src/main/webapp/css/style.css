@@ -4,8 +4,6 @@
 }
 
 .container {
-	background-image: url("fondo.jpg");
-	background-size: cover;
 	height: 90vh;
 }
 

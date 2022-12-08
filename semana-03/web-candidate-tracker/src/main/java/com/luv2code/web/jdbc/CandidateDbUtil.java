@@ -9,56 +9,58 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-public class StudentDbUtil {
+public class CandidateDbUtil {
 
 	private DataSource dataSource;
 
-	public StudentDbUtil(DataSource theDataSource) {
+	public CandidateDbUtil(DataSource theDataSource) {
 		dataSource = theDataSource;
 	}
-	
-	public List<Student> getStudents() throws Exception {
-		
-		List<Student> students = new ArrayList<>();
-		
+
+	public List<Candidate> getCandidates() throws Exception {
+
+		List<Candidate> candidates = new ArrayList<>();
+
 		Connection myConn = null;
 		Statement myStmt = null;
 		ResultSet myRs = null;
-		
+
 		try {
 			// get a connection
 			myConn = dataSource.getConnection();
-			
+
 			// create sql statement
-			String sql = "select * from student order by last_name";
-			
+			String sql = "select * from candidates order by last_name";
+
 			myStmt = myConn.createStatement();
-			
+
 			// execute query
 			myRs = myStmt.executeQuery(sql);
-			
+
 			// process result set
 			while (myRs.next()) {
-				
+
 				// retrieve data from result set row
 				int id = myRs.getInt("id");
-				String firstName = myRs.getString("first_name");
+				String firstName = myRs.getString("name");
 				String lastName = myRs.getString("last_name");
 				String email = myRs.getString("email");
-				
+				String phone = myRs.getString("phone");
+				String department = myRs.getString("department");
+				String degree = myRs.getString("degree");
+
 				// create new student object
-				Student tempStudent = new Student(id, firstName, lastName, email);
-				
+				Candidate tempStudent = new Candidate(id, firstName, lastName, email, phone, department, degree);
+
 				// add it to the list of students
-				students.add(tempStudent);				
+				candidates.add(tempStudent);
 			}
-			
-			return students;		
-		}
-		finally {
+
+			return candidates;
+		} finally {
 			// close JDBC objects
 			close(myConn, myStmt, myRs);
-		}		
+		}
 	}
 
 	private void close(Connection myConn, Statement myStmt, ResultSet myRs) {
@@ -67,173 +69,159 @@ public class StudentDbUtil {
 			if (myRs != null) {
 				myRs.close();
 			}
-			
+
 			if (myStmt != null) {
 				myStmt.close();
 			}
-			
+
 			if (myConn != null) {
-				myConn.close();   // doesn't really close it ... just puts back in connection pool
+				myConn.close(); // doesn't really close it ... just puts back in connection pool
 			}
-		}
-		catch (Exception exc) {
+		} catch (Exception exc) {
 			exc.printStackTrace();
 		}
 	}
 
-	public void addStudent(Student theStudent) throws Exception {
+	public void addCandidate(Candidate theCandidate) throws Exception {
 
 		Connection myConn = null;
 		PreparedStatement myStmt = null;
-		
+
 		try {
 			// get db connection
 			myConn = dataSource.getConnection();
-			
+
 			// create sql for insert
-			String sql = "insert into student "
-					   + "(first_name, last_name, email) "
-					   + "values (?, ?, ?)";
-			
+			String sql = "insert into candidates " + "(name, last_name, email, phone, department, degree) "
+					+ "values (?, ?, ?, ?, ?, ?)";
+
 			myStmt = myConn.prepareStatement(sql);
-			
+
 			// set the param values for the student
-			myStmt.setString(1, theStudent.getFirstName());
-			myStmt.setString(2, theStudent.getLastName());
-			myStmt.setString(3, theStudent.getEmail());
-			
+			myStmt.setString(1, theCandidate.getName());
+			myStmt.setString(2, theCandidate.getLastName());
+			myStmt.setString(3, theCandidate.getEmail());
+			myStmt.setString(4, theCandidate.getPhone());
+			myStmt.setString(5, theCandidate.getDepartment());
+			myStmt.setString(6, theCandidate.getDegree());
+
 			// execute sql insert
 			myStmt.execute();
-		}
-		finally {
+		} finally {
 			// clean up JDBC objects
 			close(myConn, myStmt, null);
 		}
 	}
 
-	public Student getStudent(String theStudentId) throws Exception {
+	public Candidate getCandidate(String theCandidateId) throws Exception {
 
-		Student theStudent = null;
-		
+		Candidate theCandidate = null;
+
 		Connection myConn = null;
 		PreparedStatement myStmt = null;
 		ResultSet myRs = null;
-		int studentId;
-		
+		int candidateId;
+
 		try {
 			// convert student id to int
-			studentId = Integer.parseInt(theStudentId);
-			
+			candidateId = Integer.parseInt(theCandidateId);
+
 			// get connection to database
 			myConn = dataSource.getConnection();
-			
+
 			// create sql to get selected student
-			String sql = "select * from student where id=?";
-			
+			String sql = "select * from candidates where id=?";
+
 			// create prepared statement
 			myStmt = myConn.prepareStatement(sql);
-			
+
 			// set params
-			myStmt.setInt(1, studentId);
-			
+			myStmt.setInt(1, candidateId);
+
 			// execute statement
 			myRs = myStmt.executeQuery();
-			
+
 			// retrieve data from result set row
 			if (myRs.next()) {
-				String firstName = myRs.getString("first_name");
+				String firstName = myRs.getString("name");
 				String lastName = myRs.getString("last_name");
 				String email = myRs.getString("email");
-				
+				String phone = myRs.getString("phone");
+				String department = myRs.getString("department");
+				String degree = myRs.getString("degree");
+
 				// use the studentId during construction
-				theStudent = new Student(studentId, firstName, lastName, email);
+				theCandidate = new Candidate(candidateId, firstName, lastName, email, phone, department, degree);
+			} else {
+				throw new Exception("Could not find candidate id: " + candidateId);
 			}
-			else {
-				throw new Exception("Could not find student id: " + studentId);
-			}				
-			
-			return theStudent;
-		}
-		finally {
+
+			return theCandidate;
+		} finally {
 			// clean up JDBC objects
 			close(myConn, myStmt, myRs);
 		}
 	}
 
-	public void updateStudent(Student theStudent) throws Exception {
-		
+	public void updateCandidate(Candidate theCandidate) throws Exception {
+
 		Connection myConn = null;
 		PreparedStatement myStmt = null;
 
 		try {
 			// get db connection
 			myConn = dataSource.getConnection();
-			
+
 			// create SQL update statement
-			String sql = "update student "
-						+ "set first_name=?, last_name=?, email=? "
-						+ "where id=?";
-			
+			String sql = "update candidates " + "set name=?, last_name=?, email=?, phone=?, department=?, degree=? "
+					+ "where id=?";
+
 			// prepare statement
 			myStmt = myConn.prepareStatement(sql);
-			
+
 			// set params
-			myStmt.setString(1, theStudent.getFirstName());
-			myStmt.setString(2, theStudent.getLastName());
-			myStmt.setString(3, theStudent.getEmail());
-			myStmt.setInt(4, theStudent.getId());
-			
+			myStmt.setString(1, theCandidate.getName());
+			myStmt.setString(2, theCandidate.getLastName());
+			myStmt.setString(3, theCandidate.getEmail());
+			myStmt.setString(4, theCandidate.getPhone());
+			myStmt.setString(5, theCandidate.getDepartment());
+			myStmt.setString(6, theCandidate.getDegree());
+			myStmt.setInt(7, theCandidate.getId());
+
 			// execute SQL statement
 			myStmt.execute();
-		}
-		finally {
+		} finally {
 			// clean up JDBC objects
 			close(myConn, myStmt, null);
 		}
 	}
 
-	public void deleteStudent(String theStudentId) throws Exception {
+	public void deleteStudent(String theCandidateId) throws Exception {
 
 		Connection myConn = null;
 		PreparedStatement myStmt = null;
-		
+
 		try {
 			// convert student id to int
-			int studentId = Integer.parseInt(theStudentId);
-			
+			int candidateId = Integer.parseInt(theCandidateId);
+
 			// get connection to database
 			myConn = dataSource.getConnection();
-			
+
 			// create sql to delete student
-			String sql = "delete from student where id=?";
-			
+			String sql = "delete from candidates where id=?";
+
 			// prepare statement
 			myStmt = myConn.prepareStatement(sql);
-			
+
 			// set params
-			myStmt.setInt(1, studentId);
-			
+			myStmt.setInt(1, candidateId);
+
 			// execute sql statement
 			myStmt.execute();
-		}
-		finally {
+		} finally {
 			// clean up JDBC code
 			close(myConn, myStmt, null);
-		}	
+		}
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
