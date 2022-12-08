@@ -3,6 +3,11 @@
 	padding: 0px;
 }
 
+.container {
+	background-image: url(fondo.jpg);
+	background-size: cover;
+}
+
 .container-title {
 	background-image: linear-gradient(to right, #122942, #145f8b);
 	width: 100vw;
@@ -33,8 +38,6 @@
 .form {
 	width: 50%;
 	border: 1px solid black;
-	border-radius: 10px;
-	margin: 30px auto;
 	background: rgba(0,0,0,0.5);
 }
 
@@ -86,6 +89,7 @@ input {
 	font-weight: bold;
 	font-size: 20px;
 	width: 50%;
+	color: white;
 }
 
 .btn-back:hover {

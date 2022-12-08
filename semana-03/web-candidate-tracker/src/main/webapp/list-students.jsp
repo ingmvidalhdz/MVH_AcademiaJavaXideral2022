@@ -14,7 +14,7 @@
 	<div class="container">
 		<div class="content center">
 			<!-- put new button: Add Student -->
-			<input class="btn-add" type="button" value="Add Student"
+			<input class="btn-add" type="button" value="Add Candidate"
 				onclick="window.location.href='add-student-form.html'; return false;" />
 			<table class="table-content center">
 				<tr>
