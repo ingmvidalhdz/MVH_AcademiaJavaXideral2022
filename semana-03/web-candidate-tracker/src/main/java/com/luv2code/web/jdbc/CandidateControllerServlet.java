@@ -116,6 +116,7 @@ public class CandidateControllerServlet extends HttpServlet {
 		
 		// create a new student object
 		Candidate theCandidate = new Candidate(id, firstName, lastName, email, phone, department, degree);
+		System.out.println("En update"+ theCandidate);
 		
 		// perform update on database
 		candidateDbUtil.updateCandidate(theCandidate);
