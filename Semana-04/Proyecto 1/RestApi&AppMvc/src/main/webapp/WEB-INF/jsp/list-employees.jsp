@@ -45,29 +45,29 @@
 				</tr>
 				
 				<!-- loop over and print our customers -->
-				<c:forEach var="tempCustomer" items="${customers}">
+				<c:forEach var="tempEmployee" items="${employees}">
 				
 					<!-- construct an "update" link with customer id -->
 					<c:url var="updateLink" value="/mvc/showFormForUpdate">
-						<c:param name="customerId" value="${tempCustomer.id}" />
+						<c:param name="employeeId" value="${tempEmployee.id}" />
 					</c:url>					
 
 					<!-- construct an "delete" link with customer id -->
 					<c:url var="deleteLink" value="/mvc/delete">
-						<c:param name="customerId" value="${tempCustomer.id}" />
+						<c:param name="employeeId" value="${tempEmployee.id}" />
 					</c:url>					
 					
 					<tr>
-						<td> ${tempCustomer.firstName} </td>
-						<td> ${tempCustomer.lastName} </td>
-						<td> ${tempCustomer.email} </td>
+						<td> ${tempEmployee.firstName} </td>
+						<td> ${tempEmployee.lastName} </td>
+						<td> ${tempEmployee.email} </td>
 						
 						<td>
 							<!-- display the update link -->
 							<a href="${updateLink}">Update</a>
 							|
 							<a href="${deleteLink}"
-							   onclick="if (!(confirm('Are you sure you want to delete this customer?'))) return false">Delete</a>
+							   onclick="if (!(confirm('Are you sure you want to delete this employee?'))) return false">Delete</a>
 						</td>
 						
 					</tr>

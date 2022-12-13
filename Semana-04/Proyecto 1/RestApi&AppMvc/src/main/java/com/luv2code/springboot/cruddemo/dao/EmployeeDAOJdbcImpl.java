@@ -22,11 +22,11 @@ public class EmployeeDAOJdbcImpl implements EmployeeDAO {
 
 		List<Employee> listaEmpleados = new ArrayList<>();
 
-		String sql = "select * from employee";
+		String sql = "SELECT * FROM employee";
 
 		try (Connection myConn = dataSource.getConnection();
-			Statement myStmt = myConn.createStatement();
-			ResultSet myRs = myStmt.executeQuery(sql);) {
+				Statement myStmt = myConn.createStatement();
+				ResultSet myRs = myStmt.executeQuery(sql);) {
 
 			// process result set
 			while (myRs.next()) {
@@ -54,10 +54,11 @@ public class EmployeeDAOJdbcImpl implements EmployeeDAO {
 	@Override
 	public Employee findById(int theId) {
 		Employee theEmployee = null;
+		String sqlString = "SELECT * FROM employee WHERE id=?";
 
 		try (Connection myConn = dataSource.getConnection();
-			PreparedStatement myStmt = createPreparedStatement(myConn, theId);
-			ResultSet myRs = myStmt.executeQuery();) {
+				PreparedStatement myStmt = createPreparedStatement(myConn, theId, sqlString);
+				ResultSet myRs = myStmt.executeQuery();) {
 
 			// retrieve data from result set row
 			if (myRs.next()) {
@@ -76,19 +77,59 @@ public class EmployeeDAOJdbcImpl implements EmployeeDAO {
 		return theEmployee;
 	}
 
-	private PreparedStatement createPreparedStatement(Connection con, int empleadoId) throws SQLException {
-		String sql = "select * from employee where id=?";
+	private PreparedStatement createPreparedStatement(Connection con, int empleadoId, String sqlString)
+			throws SQLException {
+		String sql = sqlString;
 		PreparedStatement ps = con.prepareStatement(sql);
 		ps.setInt(1, empleadoId);
 		return ps;
 	}
 
+	private PreparedStatement createPreparedStatement(Connection con, String sqlString) throws SQLException {
+		String sql = sqlString;
+		PreparedStatement ps = con.prepareStatement(sql);
+		return ps;
+	}
+
 	@Override
 	public void save(Employee theEmployee) {
+		String sqlString = null;
+		try (Connection myConn = dataSource.getConnection();) {
+			if (theEmployee.getId() == 0) {
+				sqlString = "INSERT INTO employee (first_name, last_name, email) VALUES (?,?,?)";
+				try (PreparedStatement myStmt = createPreparedStatement(myConn, sqlString);) {
+					myStmt.setString(1, theEmployee.getFirstName());
+					myStmt.setString(2, theEmployee.getLastName());
+					myStmt.setString(3, theEmployee.getEmail());
+					System.out.println("Insertando " + theEmployee.getFirstName() + ", " + theEmployee.getLastName());
+					myStmt.execute();
+				}
+			} else {
+				sqlString = "UPDATE employee SET first_name=?, last_name=?, email=? WHERE id=?";
+				try (PreparedStatement myStmt = createPreparedStatement(myConn, theEmployee.getId(), sqlString);) {
+					myStmt.setString(1, theEmployee.getFirstName());
+					myStmt.setString(2, theEmployee.getLastName());
+					myStmt.setString(3, theEmployee.getEmail());
+					myStmt.setInt(4, theEmployee.getId());
+					System.out.println("Modificando: " + theEmployee.getFirstName() + ", " + theEmployee.getLastName());
+					myStmt.execute();
+				}
+			}
+		} catch (SQLException e) {
+			System.out.println(e.toString());
+		}
 	}
 
 	@Override
 	public void deleteById(int theId) {
+		String sqlString = "DELETE FROM employee WHERE id=?";
+		try (Connection myConn = dataSource.getConnection();
+				PreparedStatement myStmt = createPreparedStatement(myConn, theId, sqlString)) {
+			System.out.println("Eliminando al empleado con el id "+ theId);
+			myStmt.execute();
+		} catch (SQLException e) {
+			System.out.println(e.toString());
+		}
 	}
 
 }

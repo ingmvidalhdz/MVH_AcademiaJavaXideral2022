@@ -26,23 +26,23 @@ public class EmployeeMvcController {
 	public String listCustomers(Model theModel) {
 		
 		// get customers from the service
-		List<Employee> theCustomers = employeeService.findAll();
+		List<Employee> theEmployees = employeeService.findAll();
 				
 		// add the customers to the model
-		theModel.addAttribute("customers", theCustomers);
+		theModel.addAttribute("employees", theEmployees);
 		
-		return "list-customers";
+		return "list-employees";
 	}
 
 	@GetMapping("/showFormForAdd")
 	public String showFormForAdd(Model theModel) {
 		
 		// create model attribute to bind form data
-		Employee theCustomer = new Employee();
+		Employee theEmployee = new Employee();
 		
-		theModel.addAttribute("customer", theCustomer);
+		theModel.addAttribute("employee", theEmployee);
 		
-		return "customer-form";
+		return "employee-form";
 	}
 	
 	@PostMapping("/saveCustomer")
@@ -55,21 +55,21 @@ public class EmployeeMvcController {
 	}
 	
 	@GetMapping("/showFormForUpdate")
-	public String showFormForUpdate(@RequestParam("customerId") int theId,
+	public String showFormForUpdate(@RequestParam("employeeId") int theId,
 									Model theModel) {
 		
 		// get the customer from our service
-		Employee theCustomer = employeeService.findById(theId);	
+		Employee theEmployee = employeeService.findById(theId);	
 		
 		// set customer as a model attribute to pre-populate the form
-		theModel.addAttribute("customer", theCustomer);
+		theModel.addAttribute("employee", theEmployee);
 		
 		// send over to our form		
-		return "customer-form";
+		return "employee-form";
 	}
 	
 	@GetMapping("/delete")
-	public String deleteCustomer(@RequestParam("customerId") int theId) {
+	public String deleteCustomer(@RequestParam("employeeId") int theId) {
 		
 		// delete the customer
 		employeeService.deleteById(theId);
